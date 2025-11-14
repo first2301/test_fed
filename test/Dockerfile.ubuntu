@@ -1,0 +1,43 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y openssh-server
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+RUN pip install --upgrade pip setuptools wheel 
+
+RUN pip install flwr[simulation]>=1.23.0 \
+    flwr-datasets[vision]>=0.5.0 \
+    scikit-learn>=1.6.1
+
+RUN mkdir -p /root/distributed
+
+# SSH 디렉토리 생성
+RUN mkdir -p /var/run/sshd
+
+# SSH 호스트 키 생성
+RUN ssh-keygen -A
+
+# SSH 설정 파일 수정
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
+
+# root 비밀번호 설정
+RUN echo 'root:password' | chpasswd
+
+# SSH 서비스 시작 후 컨테이너 유지
+RUN echo '#!/bin/bash\n\
+service ssh start\n\
+exec tail -f /dev/null' > /start.sh && chmod +x /start.sh
+
+CMD ["/start.sh"]

@@ -1,0 +1,140 @@
+services:
+  # ============================================
+  # Silo 컨테이너들 (메인)
+  # ============================================
+  silo-1:
+    build:
+      context: .
+      dockerfile: Dockerfile.ubuntu
+    container_name: silo-1
+    ports:
+      - "2222:22"  # SSH 포트
+    volumes:
+      # Docker 소켓 마운트 (사이드카와 공유)
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  silo-2:
+    build:
+      context: .
+      dockerfile: Dockerfile.ubuntu
+    container_name: silo-2
+    ports:
+      - "2223:22"  # SSH 포트
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  silo-3:
+    build:
+      context: .
+      dockerfile: Dockerfile.ubuntu
+    container_name: silo-3
+    ports:
+      - "2224:22"  # SSH 포트
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  silo-4:
+    build:
+      context: .
+      dockerfile: Dockerfile.ubuntu
+    container_name: silo-4
+    ports:
+      - "2225:22"  # SSH 포트
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  silo-5:
+    build:
+      context: .
+      dockerfile: Dockerfile.ubuntu
+    container_name: silo-5
+    ports:
+      - "2226:22"  # SSH 포트
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  silo-6:
+    build:
+      context: .
+      dockerfile: Dockerfile.ubuntu
+    container_name: silo-6
+    ports:
+      - "2227:22"  # SSH 포트
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  # ============================================
+  # Docker API 사이드카 컨테이너들
+  # Unix 소켓을 TCP 포트로 변환
+  # ============================================
+  silo-1-docker-api:
+    image: alpine/socat:latest
+    container_name: silo-1-docker-api
+    command: tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "2375:2375"  # Docker API 포트
+    depends_on:
+      - silo-1
+    restart: unless-stopped
+
+  silo-2-docker-api:
+    image: alpine/socat:latest
+    container_name: silo-2-docker-api
+    command: tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "2376:2375"  # Docker API 포트 (호스트 포트는 다르게)
+    depends_on:
+      - silo-2
+    restart: unless-stopped
+
+  silo-3-docker-api:
+    image: alpine/socat:latest
+    container_name: silo-3-docker-api
+    command: tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "2377:2375"  # Docker API 포트
+    depends_on:
+      - silo-3
+    restart: unless-stopped
+
+  silo-4-docker-api:
+    image: alpine/socat:latest
+    container_name: silo-4-docker-api
+    command: tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "2378:2375"  # Docker API 포트
+    depends_on:
+      - silo-4
+    restart: unless-stopped
+
+  silo-5-docker-api:
+    image: alpine/socat:latest
+    container_name: silo-5-docker-api
+    command: tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "2379:2375"  # Docker API 포트
+    depends_on:
+      - silo-5
+    restart: unless-stopped
+
+  silo-6-docker-api:
+    image: alpine/socat:latest
+    container_name: silo-6-docker-api
+    command: tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "2380:2375"  # Docker API 포트
+    depends_on:
+      - silo-6
+    restart: unless-stopped
