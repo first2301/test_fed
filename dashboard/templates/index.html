@@ -5,7 +5,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>연합컴퓨팅 노드 관리</title>
-  <link rel="stylesheet" href="/static/css/style.css" />
+  <!-- CSS 모듈화된 파일들 -->
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <link rel="stylesheet" href="/static/css/layout/header.css" />
+  <link rel="stylesheet" href="/static/css/layout/sidebar.css" />
+  <link rel="stylesheet" href="/static/css/layout/layout.css" />
+  <link rel="stylesheet" href="/static/css/components/toolbar.css" />
+  <link rel="stylesheet" href="/static/css/components/buttons.css" />
+  <link rel="stylesheet" href="/static/css/components/cards.css" />
+  <link rel="stylesheet" href="/static/css/components/badges.css" />
+  <link rel="stylesheet" href="/static/css/components/modals.css" />
+  <link rel="stylesheet" href="/static/css/components/forms.css" />
+  <link rel="stylesheet" href="/static/css/views/serverView.css" />
+  <link rel="stylesheet" href="/static/css/views/graphView.css" />
+  <link rel="stylesheet" href="/static/css/utilities/animations.css" />
+  <link rel="stylesheet" href="/static/css/utilities/loading.css" />
+  <link rel="stylesheet" href="/static/css/utilities/empty-state.css" />
+  <link rel="stylesheet" href="/static/css/utilities/responsive.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
@@ -193,6 +209,6 @@
   <script src="https://unpkg.com/cytoscape@3.27.0/dist/cytoscape.min.js"></script>
   <script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
   <script src="https://unpkg.com/cytoscape-dagre@2.5.0/cytoscape-dagre.js"></script>
-  <script src="/static/js/main.js"></script>
+  <script type="module" src="/static/js/main.js"></script>
 </body>
 </html>
