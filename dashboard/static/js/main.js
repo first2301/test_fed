@@ -6,54 +6,22 @@ let currentServers = []; // 현재 서버 목록
 
 // 뷰 전환 함수
 function switchView(viewType) {
-  const tableView = document.getElementById('tableView');
-  const graphView = document.getElementById('graphView');
   const serverView = document.getElementById('serverView');
   const serverGraphView = document.getElementById('serverGraphView');
   const statsSection = document.getElementById('statsSection');
   const toolbarSection = document.getElementById('toolbarSection');
-  const tableBtn = document.getElementById('tableViewBtn');
-  const graphBtn = document.getElementById('graphViewBtn');
   const serverBtn = document.getElementById('serverManagerBtn');
   const serverGraphBtn = document.getElementById('serverGraphBtn');
 
   // 모든 뷰 숨기기
-  tableView.style.display = 'none';
-  graphView.style.display = 'none';
   serverView.style.display = 'none';
   serverGraphView.style.display = 'none';
   
   // 모든 버튼 비활성화
-  tableBtn.classList.remove('active');
-  graphBtn.classList.remove('active');
   serverBtn.classList.remove('active');
   serverGraphBtn.classList.remove('active');
 
-  if (viewType === 'table') {
-    tableView.style.display = 'block';
-    statsSection.style.display = 'grid';
-    toolbarSection.style.display = 'flex';
-    tableBtn.classList.add('active');
-  } else if (viewType === 'graph') {
-    graphView.style.display = 'block';
-    statsSection.style.display = 'grid';
-    toolbarSection.style.display = 'flex';
-    graphBtn.classList.add('active');
-    
-    // 그래프 뷰로 전환 시 항상 그래프 렌더링 시도
-    // 약간의 지연을 두어 DOM이 완전히 표시된 후 렌더링
-    setTimeout(() => {
-      if (currentContainers.length > 0) {
-        renderGraph(currentContainers);
-      } else {
-        // 데이터가 없어도 빈 그래프 메시지 표시
-        const container = document.getElementById('cy');
-        if (container) {
-          container.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">컨테이너 데이터를 불러오는 중...</div>';
-        }
-      }
-    }, 100);
-  } else if (viewType === 'server') {
+  if (viewType === 'server') {
     serverView.style.display = 'block';
     statsSection.style.display = 'none';
     toolbarSection.style.display = 'none';
@@ -558,20 +526,8 @@ function renderServerGraph(servers) {
             'min-width': '140px',
             'min-height': '60px',
             'padding': '12px 16px',
-            'background-color': function(ele) {
-              const status = ele.data('status');
-              const role = ele.data('role');
-              if (role === 'central') {
-                return status === 'online' ? '#FFF3CD' : '#FFEBEE';
-              }
-              if (status === 'online') {
-                return '#E8F5E9'; // Kubeflow 성공 배경 (#34A853 기반)
-              } else if (status === 'offline') {
-                return '#FFEBEE'; // Kubeflow 실패 배경 (#EA4335 기반)
-              }
-              return '#F5F5F5'; // 대기 상태
-            },
-            'border-width': '2px',
+            'background-color': '#FFFFFF',
+            'border-width': '1px',
             'border-color': function(ele) {
               const status = ele.data('status');
               const role = ele.data('role');
@@ -579,7 +535,7 @@ function renderServerGraph(servers) {
                 return status === 'online' ? '#4B5563' : '#EA4335';
               }
               if (status === 'online') {
-                return '#34A853'; // Kubeflow 성공 테두리 (정확한 색상)
+                return '#60A5FA'; // 연파랑 (기존: #34A853)
               } else if (status === 'offline') {
                 return '#EA4335'; // Kubeflow 실패 테두리 (정확한 색상)
               }
@@ -607,11 +563,8 @@ function renderServerGraph(servers) {
               const label = ele.data('label') || '';
               return `${icon} ${label}`;
             },
-            'background-color': function(ele) {
-              const status = ele.data('status');
-              return status === 'online' ? '#FFF3CD' : '#FFEBEE';
-            },
-            'border-width': '3px',
+            'background-color': '#FFFFFF',
+            'border-width': '1.5px',
             'border-color': function(ele) {
               const status = ele.data('status');
               return status === 'online' ? '#4B5563' : '#EA4335';
@@ -626,7 +579,7 @@ function renderServerGraph(servers) {
         {
           selector: 'node:active',
           style: {
-            'border-width': '3px',
+            'border-width': '1.5px',
             'transform': 'scale(0.98)',
             'transition-duration': '0.1s'
           }
@@ -634,7 +587,7 @@ function renderServerGraph(servers) {
         {
           selector: 'node:hover',
           style: {
-            'border-width': '3px',
+            'border-width': '1.5px',
             'border-color': function(ele) {
               const status = ele.data('status');
               const role = ele.data('role');
@@ -642,26 +595,12 @@ function renderServerGraph(servers) {
                 return status === 'online' ? '#4B5563' : '#EA4335';
               }
               if (status === 'online') {
-                return '#34A853';
+                return '#60A5FA';
               } else if (status === 'offline') {
                 return '#EA4335';
               }
               return '#9E9E9E';
             },
-            'overlay-color': function(ele) {
-              const status = ele.data('status');
-              const role = ele.data('role');
-              if (role === 'central') {
-                return status === 'online' ? '#4B5563' : '#EA4335';
-              }
-              if (status === 'online') {
-                return '#34A853';
-              } else if (status === 'offline') {
-                return '#EA4335';
-              }
-              return '#9E9E9E';
-            },
-            'overlay-opacity': 0.08,
             'transition-duration': '0.15s',
             'box-shadow': '0 4px 12px rgba(0, 0, 0, 0.15)'
           }
@@ -669,7 +608,7 @@ function renderServerGraph(servers) {
         {
           selector: 'node:selected',
           style: {
-            'border-width': '4px',
+            'border-width': '2px',
             'border-color': function(ele) {
               const status = ele.data('status');
               const role = ele.data('role');
@@ -677,42 +616,21 @@ function renderServerGraph(servers) {
                 return status === 'online' ? '#4B5563' : '#EA4335';
               }
               if (status === 'online') {
-                return '#34A853';
+                return '#60A5FA';
               } else if (status === 'offline') {
                 return '#EA4335';
               }
               return '#9E9E9E';
             },
-            'background-color': function(ele) {
-              const status = ele.data('status');
-              const role = ele.data('role');
-              if (role === 'central') {
-                return status === 'online' ? '#FFF3CD' : '#FFEBEE';
-              }
-              return status === 'online' ? '#E8F5E9' : '#FFEBEE';
-            },
+            'background-color': '#FFFFFF',
             'z-index': 1000,
-            'overlay-color': function(ele) {
-              const status = ele.data('status');
-              const role = ele.data('role');
-              if (role === 'central') {
-                return status === 'online' ? '#4B5563' : '#EA4335';
-              }
-              if (status === 'online') {
-                return '#34A853';
-              } else if (status === 'offline') {
-                return '#EA4335';
-              }
-              return '#9E9E9E';
-            },
-            'overlay-opacity': 0.12,
             'box-shadow': '0 6px 16px rgba(0, 0, 0, 0.2)'
           }
         },
         {
           selector: 'edge',
           style: {
-            'width': 2,
+            'width': 1,
             'line-color': '#9CA3AF', // Kubeflow 기본 엣지 색상
             'line-style': 'solid',
             'target-arrow-shape': 'triangle',
@@ -730,7 +648,7 @@ function renderServerGraph(servers) {
         {
           selector: 'edge:hover',
           style: {
-            'width': 3,
+            'width': 1.5,
             'line-color': '#6366F1',
             'target-arrow-color': '#6366F1',
             'opacity': 0.9
@@ -739,7 +657,7 @@ function renderServerGraph(servers) {
         {
           selector: 'edge:selected',
           style: {
-            'width': 3,
+            'width': 1.5,
             'line-color': '#6366F1',
             'target-arrow-color': '#6366F1',
             'opacity': 1
@@ -834,7 +752,6 @@ function showServerDetailsPanel(serverData) {
   
   const statusText = serverData.status === 'online' ? '온라인' : '오프라인';
   const roleText = serverData.role === 'central' ? '중앙 서버' : '클라이언트 서버';
-  const typeText = serverData.type === 'local' ? '로컬' : '원격';
   
   content.innerHTML = `
     <div class="detail-section">
@@ -865,12 +782,8 @@ function showServerDetailsPanel(serverData) {
     <div class="detail-section">
       <h4><i class="fas fa-network-wired"></i> 연결 정보</h4>
       <div class="detail-item">
-        <span class="detail-label">Docker URL:</span>
+        <span class="detail-label">URL:</span>
         <span class="detail-value">${server.base_url || serverData.base_url || 'N/A'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">연결 타입:</span>
-        <span class="detail-value">${typeText}</span>
       </div>
     </div>
   `;
@@ -1125,8 +1038,10 @@ function showToast(message, type = 'info') {
   }, 3000);
 }
 
-// 페이지 로드 시 기본 노드로 초기 로딩
-window.addEventListener("load", reloadContainers);
+// 페이지 로드 시 기본 뷰를 서버 그래프로 설정
+window.addEventListener("load", function() {
+  switchView('serverGraph');
+});
 
 // ============================================
 // 서버 관리 함수
@@ -1222,9 +1137,9 @@ async function loadServerList() {
         </div>
         <div class="server-actions">
           ${server.id !== 'main' ? `
-          <button class="btn-server-action test" onclick="testServerConnectionById('${server.id}')" title="연결 테스트">
+          <button class="btn-server-action test" onclick="testServerConnectionById('${server.id}')" title="연결">
             <i class="fas fa-plug"></i>
-            <span>테스트</span>
+            <span>연결</span>
           </button>
           <button class="btn-server-action edit" onclick="editServer('${server.id}')" title="수정">
             <i class="fas fa-edit"></i>
@@ -1318,8 +1233,6 @@ async function editServer(serverId) {
     document.getElementById('serverId').value = server.id;
     document.getElementById('serverLabel').value = server.label;
     document.getElementById('serverUrl').value = server.base_url;
-    document.getElementById('serverType').value = server.type || 'remote';
-    document.getElementById('serverRole').value = server.role || 'client';
     document.getElementById('serverTls').checked = server.tls || false;
     
     // 모달 열기
@@ -1343,8 +1256,6 @@ async function saveServer(event) {
     id: document.getElementById('serverId').value.trim(),
     label: document.getElementById('serverLabel').value.trim(),
     base_url: document.getElementById('serverUrl').value.trim(),
-    type: document.getElementById('serverType').value,
-    role: document.getElementById('serverRole').value,
     tls: document.getElementById('serverTls').checked
   };
   
@@ -1569,7 +1480,7 @@ async function testServerConnection() {
   const serverId = document.getElementById('serverId').value.trim();
   
   if (!serverUrl) {
-    showToast('Docker URL을 입력해주세요.', 'error');
+    showToast('URL을 입력해주세요.', 'error');
     return;
   }
   
@@ -1596,8 +1507,6 @@ async function testServerConnection() {
         id: serverId,
         label: '테스트',
         base_url: serverUrl,
-        type: document.getElementById('serverType').value,
-        role: document.getElementById('serverRole').value,
         tls: document.getElementById('serverTls').checked
       };
       

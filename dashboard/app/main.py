@@ -182,8 +182,8 @@ class ServerConfig(BaseModel):
     id: str
     label: str
     base_url: str
-    type: str = "remote"
-    role: str = "client"  # "client" 또는 "central"
+    # type 필드 제거 - 역할에 따라 자동 결정됨
+    # role 필드 제거 - 새로 추가하는 서버는 항상 "client"
     tls: bool = False
 
 
@@ -196,12 +196,12 @@ def add_node(server: ServerConfig):
     if server.id in servers:
         raise HTTPException(status_code=400, detail=f"서버 ID '{server.id}'가 이미 존재합니다")
     
-    # 서버 정보 추가
+    # 서버 정보 추가 - 새로 추가하는 서버는 항상 클라이언트 서버
     servers[server.id] = {
         "base_url": server.base_url,
         "label": server.label,
-        "type": server.type,
-        "role": server.role,
+        "type": "remote",  # 클라이언트 서버는 항상 원격
+        "role": "client",  # 새로 추가하는 서버는 항상 클라이언트
         "tls": server.tls
     }
     
@@ -221,12 +221,22 @@ def update_node(node_id: str, server: ServerConfig):
     if node_id not in servers:
         raise HTTPException(status_code=404, detail="서버를 찾을 수 없습니다")
     
-    # 서버 정보 업데이트
+    # 서버 정보 업데이트 - 기존 역할 유지 (중앙 서버는 고정, 클라이언트는 유지)
+    existing_role = servers[node_id].get("role", "client")
+    if node_id == "main":
+        # 중앙 서버는 역할과 타입 고정
+        final_role = "central"
+        final_type = "local"
+    else:
+        # 클라이언트 서버는 기존 역할 유지
+        final_role = existing_role
+        final_type = "remote"
+    
     servers[node_id] = {
         "base_url": server.base_url,
         "label": server.label,
-        "type": server.type,
-        "role": server.role,
+        "type": final_type,
+        "role": final_role,
         "tls": server.tls
     }
     
