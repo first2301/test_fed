@@ -562,32 +562,28 @@ function renderServerGraph(servers) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                // 중앙 서버는 주황 계열
-                return status === 'online' ? '#FFF3E0' : '#FFEBEE';
+                return status === 'online' ? '#FEF3C7' : '#FEE2E2';
               }
-              // Kubeflow Pipelines 정확한 색상
               if (status === 'online') {
-                return '#E8F5E9'; // Kubeflow Success 배경 (#34A853 기반)
+                return '#D1FAE5'; // Kubeflow 성공 색상
               } else if (status === 'offline') {
-                return '#FFEBEE'; // Kubeflow Failed 배경 (#EA4335 기반)
+                return '#FEE2E2'; // Kubeflow 실패 색상
               }
-              return '#F5F5F5'; // Pending 배경
+              return '#F3F4F6';
             },
             'border-width': '2px',
             'border-color': function(ele) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                // 중앙 서버는 주황 계열
-                return status === 'online' ? '#FF9800' : '#EA4335';
+                return status === 'online' ? '#F59E0B' : '#EF4444';
               }
-              // Kubeflow Pipelines 정확한 색상
               if (status === 'online') {
-                return '#34A853'; // Kubeflow Success 테두리
+                return '#10B981'; // Kubeflow 성공 테두리
               } else if (status === 'offline') {
-                return '#EA4335'; // Kubeflow Failed 테두리
+                return '#EF4444'; // Kubeflow 실패 테두리
               }
-              return '#9E9E9E'; // Pending 테두리
+              return '#9CA3AF';
             },
             'border-radius': '8px',
             'color': '#1F2937',
@@ -613,12 +609,12 @@ function renderServerGraph(servers) {
             },
             'background-color': function(ele) {
               const status = ele.data('status');
-              return status === 'online' ? '#FFF3E0' : '#FFEBEE';
+              return status === 'online' ? '#FEF3C7' : '#FEE2E2';
             },
             'border-width': '3px',
             'border-color': function(ele) {
               const status = ele.data('status');
-              return status === 'online' ? '#FF9800' : '#EA4335';
+              return status === 'online' ? '#F59E0B' : '#EF4444';
             },
             'min-width': '160px',
             'min-height': '70px',
@@ -631,6 +627,8 @@ function renderServerGraph(servers) {
           selector: 'node:active',
           style: {
             'border-width': '3px',
+            'border-color': '#6366F1',
+            'overlay-color': '#6366F1',
             'overlay-opacity': 0.1
           }
         },
@@ -638,24 +636,28 @@ function renderServerGraph(servers) {
           selector: 'node:hover',
           style: {
             'border-width': '3px',
-            'overlay-opacity': 0.08,
+            'border-color': '#6366F1',
+            'overlay-color': '#6366F1',
+            'overlay-opacity': 0.05,
             'transition-duration': '0.15s'
           }
         },
         {
           selector: 'node:selected',
           style: {
-            'border-width': '4px',
+            'border-width': '3px',
+            'border-color': '#6366F1',
             'background-color': function(ele) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                return status === 'online' ? '#FFF3E0' : '#FFEBEE';
+                return status === 'online' ? '#FEF3C7' : '#FEE2E2';
               }
-              return status === 'online' ? '#E8F5E9' : '#FFEBEE';
+              return status === 'online' ? '#D1FAE5' : '#FEE2E2';
             },
             'z-index': 1000,
-            'overlay-opacity': 0.12
+            'overlay-color': '#6366F1',
+            'overlay-opacity': 0.1
           }
         },
         {
@@ -680,6 +682,8 @@ function renderServerGraph(servers) {
           selector: 'edge:hover',
           style: {
             'width': 3,
+            'line-color': '#6366F1',
+            'target-arrow-color': '#6366F1',
             'opacity': 0.9
           }
         },
@@ -687,8 +691,8 @@ function renderServerGraph(servers) {
           selector: 'edge:selected',
           style: {
             'width': 3,
-            'line-color': '#4285F4',
-            'target-arrow-color': '#4285F4',
+            'line-color': '#6366F1',
+            'target-arrow-color': '#6366F1',
             'opacity': 1
           }
         }
@@ -1177,7 +1181,7 @@ async function loadServerList() {
             <i class="fas fa-edit"></i>
             <span>수정</span>
           </button>
-          <button class="btn-server-action delete" onclick="deleteServer('${server.id}')" title="삭제" type="button">
+          <button class="btn-server-action delete" onclick="deleteServer('${server.id}')" title="삭제">
             <i class="fas fa-trash"></i>
             <span>삭제</span>
           </button>

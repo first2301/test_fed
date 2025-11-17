@@ -562,28 +562,28 @@ function renderServerGraph(servers) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                return status === 'online' ? '#FEF3C7' : '#FEE2E2';
+                return status === 'online' ? '#FFF3CD' : '#FFEBEE';
               }
               if (status === 'online') {
-                return '#D1FAE5'; // Kubeflow 성공 색상
+                return '#E8F5E9'; // Kubeflow 성공 배경 (#34A853 기반)
               } else if (status === 'offline') {
-                return '#FEE2E2'; // Kubeflow 실패 색상
+                return '#FFEBEE'; // Kubeflow 실패 배경 (#EA4335 기반)
               }
-              return '#F3F4F6';
+              return '#F5F5F5'; // 대기 상태
             },
             'border-width': '2px',
             'border-color': function(ele) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                return status === 'online' ? '#F59E0B' : '#EF4444';
+                return status === 'online' ? '#FF9800' : '#EA4335';
               }
               if (status === 'online') {
-                return '#10B981'; // Kubeflow 성공 테두리
+                return '#34A853'; // Kubeflow 성공 테두리 (정확한 색상)
               } else if (status === 'offline') {
-                return '#EF4444'; // Kubeflow 실패 테두리
+                return '#EA4335'; // Kubeflow 실패 테두리 (정확한 색상)
               }
-              return '#9CA3AF';
+              return '#9E9E9E'; // 대기 상태
             },
             'border-radius': '8px',
             'color': '#1F2937',
@@ -609,12 +609,12 @@ function renderServerGraph(servers) {
             },
             'background-color': function(ele) {
               const status = ele.data('status');
-              return status === 'online' ? '#FEF3C7' : '#FEE2E2';
+              return status === 'online' ? '#FFF3CD' : '#FFEBEE';
             },
             'border-width': '3px',
             'border-color': function(ele) {
               const status = ele.data('status');
-              return status === 'online' ? '#F59E0B' : '#EF4444';
+              return status === 'online' ? '#FF9800' : '#EA4335';
             },
             'min-width': '160px',
             'min-height': '70px',
@@ -627,37 +627,86 @@ function renderServerGraph(servers) {
           selector: 'node:active',
           style: {
             'border-width': '3px',
-            'border-color': '#6366F1',
-            'overlay-color': '#6366F1',
-            'overlay-opacity': 0.1
+            'transform': 'scale(0.98)',
+            'transition-duration': '0.1s'
           }
         },
         {
           selector: 'node:hover',
           style: {
             'border-width': '3px',
-            'border-color': '#6366F1',
-            'overlay-color': '#6366F1',
-            'overlay-opacity': 0.05,
-            'transition-duration': '0.15s'
+            'border-color': function(ele) {
+              const status = ele.data('status');
+              const role = ele.data('role');
+              if (role === 'central') {
+                return status === 'online' ? '#FF9800' : '#EA4335';
+              }
+              if (status === 'online') {
+                return '#34A853';
+              } else if (status === 'offline') {
+                return '#EA4335';
+              }
+              return '#9E9E9E';
+            },
+            'overlay-color': function(ele) {
+              const status = ele.data('status');
+              const role = ele.data('role');
+              if (role === 'central') {
+                return status === 'online' ? '#FF9800' : '#EA4335';
+              }
+              if (status === 'online') {
+                return '#34A853';
+              } else if (status === 'offline') {
+                return '#EA4335';
+              }
+              return '#9E9E9E';
+            },
+            'overlay-opacity': 0.08,
+            'transition-duration': '0.15s',
+            'box-shadow': '0 4px 12px rgba(0, 0, 0, 0.15)'
           }
         },
         {
           selector: 'node:selected',
           style: {
-            'border-width': '3px',
-            'border-color': '#6366F1',
+            'border-width': '4px',
+            'border-color': function(ele) {
+              const status = ele.data('status');
+              const role = ele.data('role');
+              if (role === 'central') {
+                return status === 'online' ? '#FF9800' : '#EA4335';
+              }
+              if (status === 'online') {
+                return '#34A853';
+              } else if (status === 'offline') {
+                return '#EA4335';
+              }
+              return '#9E9E9E';
+            },
             'background-color': function(ele) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                return status === 'online' ? '#FEF3C7' : '#FEE2E2';
+                return status === 'online' ? '#FFF3CD' : '#FFEBEE';
               }
-              return status === 'online' ? '#D1FAE5' : '#FEE2E2';
+              return status === 'online' ? '#E8F5E9' : '#FFEBEE';
             },
             'z-index': 1000,
-            'overlay-color': '#6366F1',
-            'overlay-opacity': 0.1
+            'overlay-color': function(ele) {
+              const status = ele.data('status');
+              const role = ele.data('role');
+              if (role === 'central') {
+                return status === 'online' ? '#FF9800' : '#EA4335';
+              }
+              if (status === 'online') {
+                return '#34A853';
+              } else if (status === 'offline') {
+                return '#EA4335';
+              }
+              return '#9E9E9E';
+            },
+            'overlay-opacity': 0.12,
+            'box-shadow': '0 6px 16px rgba(0, 0, 0, 0.2)'
           }
         },
         {
@@ -1362,12 +1411,22 @@ async function deleteServer(serverId) {
     // 서버 목록 새로고침
     await loadServerList();
     
+    // 서버 그래프가 활성화되어 있으면 다시 렌더링
+    const serverGraphView = document.getElementById('serverGraphView');
+    if (serverGraphView && serverGraphView.style.display !== 'none') {
+      setTimeout(() => {
+        if (currentServers.length > 0) {
+          renderServerGraph(currentServers);
+        }
+      }, 100);
+    }
+    
     // 노드 선택 드롭다운 업데이트
     await updateNodeSelect();
     
     // 현재 선택된 노드가 삭제된 경우 기본 노드로 변경
     const nodeSelect = document.getElementById('nodeSelect');
-    if (nodeSelect.value === serverId) {
+    if (nodeSelect && nodeSelect.value === serverId) {
       nodeSelect.value = 'main';
       await reloadContainers();
     }
