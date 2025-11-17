@@ -576,7 +576,7 @@ function renderServerGraph(servers) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                return status === 'online' ? '#FF9800' : '#EA4335';
+                return status === 'online' ? '#4B5563' : '#EA4335';
               }
               if (status === 'online') {
                 return '#34A853'; // Kubeflow 성공 테두리 (정확한 색상)
@@ -614,7 +614,7 @@ function renderServerGraph(servers) {
             'border-width': '3px',
             'border-color': function(ele) {
               const status = ele.data('status');
-              return status === 'online' ? '#FF9800' : '#EA4335';
+              return status === 'online' ? '#4B5563' : '#EA4335';
             },
             'min-width': '160px',
             'min-height': '70px',
@@ -639,7 +639,7 @@ function renderServerGraph(servers) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                return status === 'online' ? '#FF9800' : '#EA4335';
+                return status === 'online' ? '#4B5563' : '#EA4335';
               }
               if (status === 'online') {
                 return '#34A853';
@@ -652,7 +652,7 @@ function renderServerGraph(servers) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                return status === 'online' ? '#FF9800' : '#EA4335';
+                return status === 'online' ? '#4B5563' : '#EA4335';
               }
               if (status === 'online') {
                 return '#34A853';
@@ -674,7 +674,7 @@ function renderServerGraph(servers) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                return status === 'online' ? '#FF9800' : '#EA4335';
+                return status === 'online' ? '#4B5563' : '#EA4335';
               }
               if (status === 'online') {
                 return '#34A853';
@@ -696,7 +696,7 @@ function renderServerGraph(servers) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                return status === 'online' ? '#FF9800' : '#EA4335';
+                return status === 'online' ? '#4B5563' : '#EA4335';
               }
               if (status === 'online') {
                 return '#34A853';
@@ -1250,6 +1250,9 @@ async function loadServerList() {
     const errorMessage = error.message || '서버 목록을 불러오는 중 오류가 발생했습니다.';
     showToast(errorMessage, 'error');
     
+    // 에러 발생 시에도 currentServers를 빈 배열로 초기화하여 UI 일관성 유지
+    currentServers = [];
+    
     // 에러 상태 표시
     const serverList = document.getElementById('serverList');
     if (serverList) {
@@ -1263,6 +1266,12 @@ async function loadServerList() {
           </button>
         </div>
       `;
+    }
+    
+    // 서버 그래프 뷰가 활성화되어 있으면 빈 상태 표시
+    const serverGraphView = document.getElementById('serverGraphView');
+    if (serverGraphView && serverGraphView.style.display !== 'none') {
+      renderServerGraph([]);
     }
   }
 }
@@ -1395,44 +1404,162 @@ async function deleteServer(serverId) {
     return;
   }
   
+  // 삭제 전에 해당 서버 아이템 찾기 (더 확실한 방법)
+  const serverList = document.getElementById('serverList');
+  let serverItemToRemove = null;
+  if (serverList) {
+    const items = serverList.querySelectorAll('.server-item');
+    items.forEach(item => {
+      // 서버 ID로 직접 찾기 (더 확실한 방법)
+      const serverDetails = item.querySelector('.server-details');
+      if (serverDetails) {
+        // 첫 번째 span에 서버 ID가 있음: <span><i class="fas fa-server"></i> ${server.id}</span>
+        const serverIdSpan = serverDetails.querySelector('span');
+        if (serverIdSpan) {
+          // 아이콘을 제외한 텍스트만 확인
+          const textContent = serverIdSpan.textContent.trim();
+          // 서버 ID가 정확히 일치하는지 확인 (공백 제거 후 비교)
+          if (textContent === serverId || textContent.includes(serverId)) {
+            serverItemToRemove = item;
+          }
+        }
+      }
+      // 백업: onclick 속성으로 찾기
+      if (!serverItemToRemove) {
+        const deleteBtn = item.querySelector(`button[onclick*="deleteServer('${serverId}')"]`);
+        if (deleteBtn) {
+          serverItemToRemove = item;
+        }
+      }
+    });
+  }
+  
   try {
+    console.log('서버 삭제 요청 시작:', serverId);
+    
     const response = await fetch(`/api/nodes/${serverId}`, {
       method: 'DELETE'
     });
     
+    console.log('서버 삭제 응답 상태:', response.status, response.statusText);
+    
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || '서버 삭제 실패');
+      // 에러 응답 처리 개선
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const error = await response.json();
+        errorMessage = error.detail || error.message || errorMessage;
+        console.error('서버 삭제 API 오류:', error);
+      } catch (jsonError) {
+        // JSON 파싱 실패 시 텍스트로 시도
+        try {
+          const text = await response.text();
+          if (text) {
+            errorMessage = text;
+          }
+          console.error('서버 삭제 응답 (텍스트):', text);
+        } catch (textError) {
+          console.error('응답 본문 읽기 실패:', textError);
+        }
+      }
+      throw new Error(errorMessage);
     }
     
-    const result = await response.json();
+    // 성공 응답 처리
+    let result;
+    try {
+      result = await response.json();
+      console.log('서버 삭제 성공:', result);
+    } catch (jsonError) {
+      // JSON 파싱 실패 시에도 성공으로 처리 (상태 코드가 200-299)
+      console.warn('응답 JSON 파싱 실패, 상태 코드로 성공 판단:', jsonError);
+      result = { ok: true, message: '서버가 삭제되었습니다.' };
+    }
+    
+    // 즉시 DOM에서 제거 (목록 새로고침 전에 제거하여 깜빡임 방지)
+    if (serverItemToRemove) {
+      serverItemToRemove.remove(); // 즉시 제거
+    }
+    
     showToast(result.message || '서버가 삭제되었습니다.', 'success');
     
-    // 서버 목록 새로고침
-    await loadServerList();
+    // 서버 목록 새로고침 (재시도 로직 추가)
+    let retryCount = 0;
+    const maxRetries = 3;
+    let loadSuccess = false;
+    
+    while (retryCount < maxRetries && !loadSuccess) {
+      try {
+        await loadServerList();
+        loadSuccess = true;
+        console.log('서버 목록 새로고침 성공');
+      } catch (loadError) {
+        retryCount++;
+        console.error(`서버 목록 새로고침 실패 (시도 ${retryCount}/${maxRetries}):`, loadError);
+        
+        if (retryCount < maxRetries) {
+          // 재시도 전 대기
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } else {
+          // 최종 실패 시 사용자에게 알림
+          showToast('서버 목록을 새로고침하지 못했습니다. 페이지를 새로고침해주세요.', 'error');
+          console.error('서버 목록 새로고침 최종 실패:', loadError);
+        }
+      }
+    }
     
     // 서버 그래프가 활성화되어 있으면 다시 렌더링
     const serverGraphView = document.getElementById('serverGraphView');
     if (serverGraphView && serverGraphView.style.display !== 'none') {
       setTimeout(() => {
-        if (currentServers.length > 0) {
-          renderServerGraph(currentServers);
-        }
+        // currentServers는 loadServerList()에서 이미 업데이트됨
+        // 빈 배열이어도 renderServerGraph가 빈 상태를 처리함
+        renderServerGraph(currentServers);
       }, 100);
     }
     
     // 노드 선택 드롭다운 업데이트
-    await updateNodeSelect();
+    try {
+      await updateNodeSelect();
+    } catch (updateError) {
+      console.error('노드 선택 드롭다운 업데이트 실패:', updateError);
+    }
     
     // 현재 선택된 노드가 삭제된 경우 기본 노드로 변경
     const nodeSelect = document.getElementById('nodeSelect');
     if (nodeSelect && nodeSelect.value === serverId) {
       nodeSelect.value = 'main';
-      await reloadContainers();
+      try {
+        await reloadContainers();
+      } catch (reloadError) {
+        console.error('컨테이너 새로고침 실패:', reloadError);
+      }
     }
   } catch (error) {
-    console.error('서버 삭제 오류:', error);
-    showToast(error.message || '서버 삭제 중 오류가 발생했습니다.', 'error');
+    // 네트워크 오류와 기타 오류 구분
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      console.error('네트워크 오류:', error);
+      showToast('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.', 'error');
+    } else if (error.name === 'AbortError') {
+      console.error('요청 취소됨:', error);
+      showToast('요청이 취소되었습니다.', 'error');
+    } else {
+      console.error('서버 삭제 오류:', error);
+      console.error('오류 상세:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      showToast(error.message || '서버 삭제 중 오류가 발생했습니다.', 'error');
+    }
+    
+    // 에러 발생 시 제거 취소 (이미 제거되지 않았으므로 복구 불필요)
+    // 하지만 혹시 모를 경우를 대비해 목록 새로고침 시도
+    try {
+      await loadServerList();
+    } catch (loadError) {
+      console.error('에러 후 목록 새로고침 실패:', loadError);
+    }
   }
 }
 

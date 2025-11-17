@@ -96,7 +96,10 @@ def index(request: Request):
 @app.get("/api/nodes")
 def list_nodes():
     """서버 목록 조회"""
-    DOCKER_HOSTS.update(load_servers())  # 최신 설정 로드
+    # clear() 후 update()로 전체 교체 - 삭제된 항목도 제거됨
+    latest_servers = load_servers()
+    DOCKER_HOSTS.clear()
+    DOCKER_HOSTS.update(latest_servers)
     return [
         {"id": node_id, "label": info.get("label", node_id)}
         for node_id, info in DOCKER_HOSTS.items()
@@ -107,14 +110,19 @@ def list_nodes():
 def get_nodes_status():
     """모든 서버의 연결 상태 확인"""
     try:
-        # 최신 설정 로드 (에러 처리 강화)
+        # 최신 설정 로드 (전체 교체하여 삭제된 서버도 제거)
         try:
-            DOCKER_HOSTS.update(load_servers())
+            latest_servers = load_servers()
+            # clear() 후 update()로 전체 교체 - 삭제된 항목도 제거됨
+            DOCKER_HOSTS.clear()
+            DOCKER_HOSTS.update(latest_servers)
         except Exception as e:
             print(f"서버 설정 로드 오류: {e}")
             # 기존 설정 유지하거나 기본값 사용
             if not DOCKER_HOSTS:
-                DOCKER_HOSTS.update(load_servers())
+                latest_servers = load_servers()
+                DOCKER_HOSTS.clear()
+                DOCKER_HOSTS.update(latest_servers)
         
         status_list = []
         for node_id, info in DOCKER_HOSTS.items():
@@ -151,7 +159,10 @@ def get_nodes_status():
 @app.get("/api/nodes/{node_id}")
 def get_node(node_id: str):
     """서버 상세 정보 조회"""
-    DOCKER_HOSTS.update(load_servers())  # 최신 설정 로드
+    # clear() 후 update()로 전체 교체 - 삭제된 항목도 제거됨
+    latest_servers = load_servers()
+    DOCKER_HOSTS.clear()
+    DOCKER_HOSTS.update(latest_servers)
     
     if node_id not in DOCKER_HOSTS:
         raise HTTPException(status_code=404, detail="서버를 찾을 수 없습니다")
@@ -195,7 +206,9 @@ def add_node(server: ServerConfig):
     }
     
     save_servers(servers)
-    DOCKER_HOSTS.update(servers)  # 메모리 업데이트
+    # clear() 후 update()로 전체 교체 - 일관성 유지
+    DOCKER_HOSTS.clear()
+    DOCKER_HOSTS.update(servers)
     
     return {"ok": True, "message": f"서버 '{server.label}'가 추가되었습니다"}
 
@@ -224,7 +237,9 @@ def update_node(node_id: str, server: ServerConfig):
         servers[server.id] = servers.pop(node_id)
     
     save_servers(servers)
-    DOCKER_HOSTS.update(servers)  # 메모리 업데이트
+    # clear() 후 update()로 전체 교체 - 일관성 유지
+    DOCKER_HOSTS.clear()
+    DOCKER_HOSTS.update(servers)
     
     return {"ok": True, "message": f"서버 '{server.label}'가 수정되었습니다"}
 
@@ -245,7 +260,9 @@ def delete_node(node_id: str):
     del servers[node_id]
     
     save_servers(servers)
-    DOCKER_HOSTS.update(servers)  # 메모리 업데이트
+    # clear() 후 update()로 전체 교체 - 삭제된 항목도 제거됨
+    DOCKER_HOSTS.clear()
+    DOCKER_HOSTS.update(servers)
     
     return {"ok": True, "message": f"서버 '{label}'가 삭제되었습니다"}
 
@@ -253,7 +270,10 @@ def delete_node(node_id: str):
 @app.post("/api/nodes/{node_id}/test")
 def test_connection(node_id: str):
     """서버 연결 테스트"""
-    DOCKER_HOSTS.update(load_servers())  # 최신 설정 로드
+    # clear() 후 update()로 전체 교체 - 삭제된 항목도 제거됨
+    latest_servers = load_servers()
+    DOCKER_HOSTS.clear()
+    DOCKER_HOSTS.update(latest_servers)
     
     if node_id not in DOCKER_HOSTS:
         raise HTTPException(status_code=404, detail="서버를 찾을 수 없습니다")
