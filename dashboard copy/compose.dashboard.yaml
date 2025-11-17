@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: fl-dashboard
+    image: fl-dashboard:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      # Docker 소켓 마운트 (로컬 Docker 접근)
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # 로그 볼륨 (선택적)
+      - dashboard-logs:/app/logs
+      # 설정 파일 디렉토리 마운트
+      - ./config:/app/config
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TZ=Asia/Seoul
+    restart: unless-stopped
+    networks:
+      - fl-network
+    # 리소스 제한
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    # 헬스체크 (Python으로 간단히 체크)
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    # 로깅 설정
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  dashboard-logs:
+    driver: local
+
+networks:
+  fl-network:
+    driver: bridge
+    name: fl-network
+
