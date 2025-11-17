@@ -6,56 +6,22 @@ let currentServers = []; // 현재 서버 목록
 
 // 뷰 전환 함수
 function switchView(viewType) {
-  const tableView = document.getElementById('tableView');
-  const graphView = document.getElementById('graphView');
   const serverView = document.getElementById('serverView');
   const serverGraphView = document.getElementById('serverGraphView');
-  const statsSection = document.getElementById('statsSection');
   const toolbarSection = document.getElementById('toolbarSection');
-  const tableBtn = document.getElementById('tableViewBtn');
-  const graphBtn = document.getElementById('graphViewBtn');
   const serverBtn = document.getElementById('serverManagerBtn');
   const serverGraphBtn = document.getElementById('serverGraphBtn');
 
   // 모든 뷰 숨기기
-  tableView.style.display = 'none';
-  graphView.style.display = 'none';
   serverView.style.display = 'none';
   serverGraphView.style.display = 'none';
   
   // 모든 버튼 비활성화
-  tableBtn.classList.remove('active');
-  graphBtn.classList.remove('active');
   serverBtn.classList.remove('active');
   serverGraphBtn.classList.remove('active');
 
-  if (viewType === 'table') {
-    tableView.style.display = 'block';
-    statsSection.style.display = 'grid';
-    toolbarSection.style.display = 'flex';
-    tableBtn.classList.add('active');
-  } else if (viewType === 'graph') {
-    graphView.style.display = 'block';
-    statsSection.style.display = 'grid';
-    toolbarSection.style.display = 'flex';
-    graphBtn.classList.add('active');
-    
-    // 그래프 뷰로 전환 시 항상 그래프 렌더링 시도
-    // 약간의 지연을 두어 DOM이 완전히 표시된 후 렌더링
-    setTimeout(() => {
-      if (currentContainers.length > 0) {
-        renderGraph(currentContainers);
-      } else {
-        // 데이터가 없어도 빈 그래프 메시지 표시
-        const container = document.getElementById('cy');
-        if (container) {
-          container.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">컨테이너 데이터를 불러오는 중...</div>';
-        }
-      }
-    }, 100);
-  } else if (viewType === 'server') {
+  if (viewType === 'server') {
     serverView.style.display = 'block';
-    statsSection.style.display = 'none';
     toolbarSection.style.display = 'none';
     serverBtn.classList.add('active');
     
@@ -63,7 +29,6 @@ function switchView(viewType) {
     loadServerList();
   } else if (viewType === 'serverGraph') {
     serverGraphView.style.display = 'block';
-    statsSection.style.display = 'none';
     toolbarSection.style.display = 'none';
     serverGraphBtn.classList.add('active');
     
@@ -558,32 +523,20 @@ function renderServerGraph(servers) {
             'min-width': '140px',
             'min-height': '60px',
             'padding': '12px 16px',
-            'background-color': function(ele) {
-              const status = ele.data('status');
-              const role = ele.data('role');
-              if (role === 'central') {
-                return status === 'online' ? '#FEF3C7' : '#FEE2E2';
-              }
-              if (status === 'online') {
-                return '#D1FAE5'; // Kubeflow 성공 색상
-              } else if (status === 'offline') {
-                return '#FEE2E2'; // Kubeflow 실패 색상
-              }
-              return '#F3F4F6';
-            },
-            'border-width': '2px',
+            'background-color': '#FFFFFF',
+            'border-width': '1px',
             'border-color': function(ele) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                return status === 'online' ? '#F59E0B' : '#EF4444';
+                return status === 'online' ? '#4B5563' : '#EA4335';
               }
               if (status === 'online') {
-                return '#10B981'; // Kubeflow 성공 테두리
+                return '#60A5FA'; // 연파랑 (기존: #34A853)
               } else if (status === 'offline') {
-                return '#EF4444'; // Kubeflow 실패 테두리
+                return '#EA4335'; // Kubeflow 실패 테두리 (정확한 색상)
               }
-              return '#9CA3AF';
+              return '#9E9E9E'; // 대기 상태
             },
             'border-radius': '8px',
             'color': '#1F2937',
@@ -607,14 +560,11 @@ function renderServerGraph(servers) {
               const label = ele.data('label') || '';
               return `${icon} ${label}`;
             },
-            'background-color': function(ele) {
-              const status = ele.data('status');
-              return status === 'online' ? '#FEF3C7' : '#FEE2E2';
-            },
-            'border-width': '3px',
+            'background-color': '#FFFFFF',
+            'border-width': '1.5px',
             'border-color': function(ele) {
               const status = ele.data('status');
-              return status === 'online' ? '#F59E0B' : '#EF4444';
+              return status === 'online' ? '#4B5563' : '#EA4335';
             },
             'min-width': '160px',
             'min-height': '70px',
@@ -626,44 +576,58 @@ function renderServerGraph(servers) {
         {
           selector: 'node:active',
           style: {
-            'border-width': '3px',
-            'border-color': '#6366F1',
-            'overlay-color': '#6366F1',
-            'overlay-opacity': 0.1
+            'border-width': '1.5px',
+            'transform': 'scale(0.98)',
+            'transition-duration': '0.1s'
           }
         },
         {
           selector: 'node:hover',
           style: {
-            'border-width': '3px',
-            'border-color': '#6366F1',
-            'overlay-color': '#6366F1',
-            'overlay-opacity': 0.05,
-            'transition-duration': '0.15s'
+            'border-width': '1.5px',
+            'border-color': function(ele) {
+              const status = ele.data('status');
+              const role = ele.data('role');
+              if (role === 'central') {
+                return status === 'online' ? '#4B5563' : '#EA4335';
+              }
+              if (status === 'online') {
+                return '#60A5FA';
+              } else if (status === 'offline') {
+                return '#EA4335';
+              }
+              return '#9E9E9E';
+            },
+            'transition-duration': '0.15s',
+            'box-shadow': '0 4px 12px rgba(0, 0, 0, 0.15)'
           }
         },
         {
           selector: 'node:selected',
           style: {
-            'border-width': '3px',
-            'border-color': '#6366F1',
-            'background-color': function(ele) {
+            'border-width': '2px',
+            'border-color': function(ele) {
               const status = ele.data('status');
               const role = ele.data('role');
               if (role === 'central') {
-                return status === 'online' ? '#FEF3C7' : '#FEE2E2';
+                return status === 'online' ? '#4B5563' : '#EA4335';
               }
-              return status === 'online' ? '#D1FAE5' : '#FEE2E2';
+              if (status === 'online') {
+                return '#60A5FA';
+              } else if (status === 'offline') {
+                return '#EA4335';
+              }
+              return '#9E9E9E';
             },
+            'background-color': '#FFFFFF',
             'z-index': 1000,
-            'overlay-color': '#6366F1',
-            'overlay-opacity': 0.1
+            'box-shadow': '0 6px 16px rgba(0, 0, 0, 0.2)'
           }
         },
         {
           selector: 'edge',
           style: {
-            'width': 2,
+            'width': 1,
             'line-color': '#9CA3AF', // Kubeflow 기본 엣지 색상
             'line-style': 'solid',
             'target-arrow-shape': 'triangle',
@@ -681,7 +645,7 @@ function renderServerGraph(servers) {
         {
           selector: 'edge:hover',
           style: {
-            'width': 3,
+            'width': 1.5,
             'line-color': '#6366F1',
             'target-arrow-color': '#6366F1',
             'opacity': 0.9
@@ -690,7 +654,7 @@ function renderServerGraph(servers) {
         {
           selector: 'edge:selected',
           style: {
-            'width': 3,
+            'width': 1.5,
             'line-color': '#6366F1',
             'target-arrow-color': '#6366F1',
             'opacity': 1
@@ -785,7 +749,6 @@ function showServerDetailsPanel(serverData) {
   
   const statusText = serverData.status === 'online' ? '온라인' : '오프라인';
   const roleText = serverData.role === 'central' ? '중앙 서버' : '클라이언트 서버';
-  const typeText = serverData.type === 'local' ? '로컬' : '원격';
   
   content.innerHTML = `
     <div class="detail-section">
@@ -816,12 +779,8 @@ function showServerDetailsPanel(serverData) {
     <div class="detail-section">
       <h4><i class="fas fa-network-wired"></i> 연결 정보</h4>
       <div class="detail-item">
-        <span class="detail-label">Docker URL:</span>
+        <span class="detail-label">URL:</span>
         <span class="detail-value">${server.base_url || serverData.base_url || 'N/A'}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">연결 타입:</span>
-        <span class="detail-value">${typeText}</span>
       </div>
     </div>
   `;
@@ -845,18 +804,6 @@ function fitServerGraph() {
       serverCy.zoom(0.5);
     }
   }
-}
-
-// 통계 업데이트 함수 (애니메이션 제거 - 안정성 향상)
-function updateStats(containers) {
-  const total = containers.length;
-  const running = containers.filter(c => c.status.toLowerCase() === 'running').length;
-  const stopped = Math.max(0, total - running); // 음수 방지
-
-  // 즉시 최종 값 표시 (애니메이션 없음)
-  document.getElementById('statTotal').textContent = total;
-  document.getElementById('statRunning').textContent = running;
-  document.getElementById('statStopped').textContent = stopped;
 }
 
 // 카드 렌더링 함수
@@ -985,9 +932,6 @@ async function reloadContainers() {
     // 전역 변수에 저장 (그래프에서 사용)
     currentContainers = data;
 
-    // 통계 업데이트
-    updateStats(data);
-
     // 카드 렌더링
     renderContainerCards(data, nodeId);
 
@@ -1076,8 +1020,10 @@ function showToast(message, type = 'info') {
   }, 3000);
 }
 
-// 페이지 로드 시 기본 노드로 초기 로딩
-window.addEventListener("load", reloadContainers);
+// 페이지 로드 시 기본 뷰를 서버 그래프로 설정
+window.addEventListener("load", function() {
+  switchView('serverGraph');
+});
 
 // ============================================
 // 서버 관리 함수
@@ -1173,9 +1119,9 @@ async function loadServerList() {
         </div>
         <div class="server-actions">
           ${server.id !== 'main' ? `
-          <button class="btn-server-action test" onclick="testServerConnectionById('${server.id}')" title="연결 테스트">
+          <button class="btn-server-action test" onclick="testServerConnectionById('${server.id}')" title="연결">
             <i class="fas fa-plug"></i>
-            <span>테스트</span>
+            <span>연결</span>
           </button>
           <button class="btn-server-action edit" onclick="editServer('${server.id}')" title="수정">
             <i class="fas fa-edit"></i>
@@ -1201,6 +1147,9 @@ async function loadServerList() {
     const errorMessage = error.message || '서버 목록을 불러오는 중 오류가 발생했습니다.';
     showToast(errorMessage, 'error');
     
+    // 에러 발생 시에도 currentServers를 빈 배열로 초기화하여 UI 일관성 유지
+    currentServers = [];
+    
     // 에러 상태 표시
     const serverList = document.getElementById('serverList');
     if (serverList) {
@@ -1214,6 +1163,12 @@ async function loadServerList() {
           </button>
         </div>
       `;
+    }
+    
+    // 서버 그래프 뷰가 활성화되어 있으면 빈 상태 표시
+    const serverGraphView = document.getElementById('serverGraphView');
+    if (serverGraphView && serverGraphView.style.display !== 'none') {
+      renderServerGraph([]);
     }
   }
 }
@@ -1260,8 +1215,6 @@ async function editServer(serverId) {
     document.getElementById('serverId').value = server.id;
     document.getElementById('serverLabel').value = server.label;
     document.getElementById('serverUrl').value = server.base_url;
-    document.getElementById('serverType').value = server.type || 'remote';
-    document.getElementById('serverRole').value = server.role || 'client';
     document.getElementById('serverTls').checked = server.tls || false;
     
     // 모달 열기
@@ -1285,8 +1238,6 @@ async function saveServer(event) {
     id: document.getElementById('serverId').value.trim(),
     label: document.getElementById('serverLabel').value.trim(),
     base_url: document.getElementById('serverUrl').value.trim(),
-    type: document.getElementById('serverType').value,
-    role: document.getElementById('serverRole').value,
     tls: document.getElementById('serverTls').checked
   };
   
@@ -1346,34 +1297,162 @@ async function deleteServer(serverId) {
     return;
   }
   
+  // 삭제 전에 해당 서버 아이템 찾기 (더 확실한 방법)
+  const serverList = document.getElementById('serverList');
+  let serverItemToRemove = null;
+  if (serverList) {
+    const items = serverList.querySelectorAll('.server-item');
+    items.forEach(item => {
+      // 서버 ID로 직접 찾기 (더 확실한 방법)
+      const serverDetails = item.querySelector('.server-details');
+      if (serverDetails) {
+        // 첫 번째 span에 서버 ID가 있음: <span><i class="fas fa-server"></i> ${server.id}</span>
+        const serverIdSpan = serverDetails.querySelector('span');
+        if (serverIdSpan) {
+          // 아이콘을 제외한 텍스트만 확인
+          const textContent = serverIdSpan.textContent.trim();
+          // 서버 ID가 정확히 일치하는지 확인 (공백 제거 후 비교)
+          if (textContent === serverId || textContent.includes(serverId)) {
+            serverItemToRemove = item;
+          }
+        }
+      }
+      // 백업: onclick 속성으로 찾기
+      if (!serverItemToRemove) {
+        const deleteBtn = item.querySelector(`button[onclick*="deleteServer('${serverId}')"]`);
+        if (deleteBtn) {
+          serverItemToRemove = item;
+        }
+      }
+    });
+  }
+  
   try {
+    console.log('서버 삭제 요청 시작:', serverId);
+    
     const response = await fetch(`/api/nodes/${serverId}`, {
       method: 'DELETE'
     });
     
+    console.log('서버 삭제 응답 상태:', response.status, response.statusText);
+    
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || '서버 삭제 실패');
+      // 에러 응답 처리 개선
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const error = await response.json();
+        errorMessage = error.detail || error.message || errorMessage;
+        console.error('서버 삭제 API 오류:', error);
+      } catch (jsonError) {
+        // JSON 파싱 실패 시 텍스트로 시도
+        try {
+          const text = await response.text();
+          if (text) {
+            errorMessage = text;
+          }
+          console.error('서버 삭제 응답 (텍스트):', text);
+        } catch (textError) {
+          console.error('응답 본문 읽기 실패:', textError);
+        }
+      }
+      throw new Error(errorMessage);
     }
     
-    const result = await response.json();
+    // 성공 응답 처리
+    let result;
+    try {
+      result = await response.json();
+      console.log('서버 삭제 성공:', result);
+    } catch (jsonError) {
+      // JSON 파싱 실패 시에도 성공으로 처리 (상태 코드가 200-299)
+      console.warn('응답 JSON 파싱 실패, 상태 코드로 성공 판단:', jsonError);
+      result = { ok: true, message: '서버가 삭제되었습니다.' };
+    }
+    
+    // 즉시 DOM에서 제거 (목록 새로고침 전에 제거하여 깜빡임 방지)
+    if (serverItemToRemove) {
+      serverItemToRemove.remove(); // 즉시 제거
+    }
+    
     showToast(result.message || '서버가 삭제되었습니다.', 'success');
     
-    // 서버 목록 새로고침
-    await loadServerList();
+    // 서버 목록 새로고침 (재시도 로직 추가)
+    let retryCount = 0;
+    const maxRetries = 3;
+    let loadSuccess = false;
+    
+    while (retryCount < maxRetries && !loadSuccess) {
+      try {
+        await loadServerList();
+        loadSuccess = true;
+        console.log('서버 목록 새로고침 성공');
+      } catch (loadError) {
+        retryCount++;
+        console.error(`서버 목록 새로고침 실패 (시도 ${retryCount}/${maxRetries}):`, loadError);
+        
+        if (retryCount < maxRetries) {
+          // 재시도 전 대기
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } else {
+          // 최종 실패 시 사용자에게 알림
+          showToast('서버 목록을 새로고침하지 못했습니다. 페이지를 새로고침해주세요.', 'error');
+          console.error('서버 목록 새로고침 최종 실패:', loadError);
+        }
+      }
+    }
+    
+    // 서버 그래프가 활성화되어 있으면 다시 렌더링
+    const serverGraphView = document.getElementById('serverGraphView');
+    if (serverGraphView && serverGraphView.style.display !== 'none') {
+      setTimeout(() => {
+        // currentServers는 loadServerList()에서 이미 업데이트됨
+        // 빈 배열이어도 renderServerGraph가 빈 상태를 처리함
+        renderServerGraph(currentServers);
+      }, 100);
+    }
     
     // 노드 선택 드롭다운 업데이트
-    await updateNodeSelect();
+    try {
+      await updateNodeSelect();
+    } catch (updateError) {
+      console.error('노드 선택 드롭다운 업데이트 실패:', updateError);
+    }
     
     // 현재 선택된 노드가 삭제된 경우 기본 노드로 변경
     const nodeSelect = document.getElementById('nodeSelect');
-    if (nodeSelect.value === serverId) {
+    if (nodeSelect && nodeSelect.value === serverId) {
       nodeSelect.value = 'main';
-      await reloadContainers();
+      try {
+        await reloadContainers();
+      } catch (reloadError) {
+        console.error('컨테이너 새로고침 실패:', reloadError);
+      }
     }
   } catch (error) {
-    console.error('서버 삭제 오류:', error);
-    showToast(error.message || '서버 삭제 중 오류가 발생했습니다.', 'error');
+    // 네트워크 오류와 기타 오류 구분
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      console.error('네트워크 오류:', error);
+      showToast('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.', 'error');
+    } else if (error.name === 'AbortError') {
+      console.error('요청 취소됨:', error);
+      showToast('요청이 취소되었습니다.', 'error');
+    } else {
+      console.error('서버 삭제 오류:', error);
+      console.error('오류 상세:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      showToast(error.message || '서버 삭제 중 오류가 발생했습니다.', 'error');
+    }
+    
+    // 에러 발생 시 제거 취소 (이미 제거되지 않았으므로 복구 불필요)
+    // 하지만 혹시 모를 경우를 대비해 목록 새로고침 시도
+    try {
+      await loadServerList();
+    } catch (loadError) {
+      console.error('에러 후 목록 새로고침 실패:', loadError);
+    }
   }
 }
 
@@ -1383,7 +1462,7 @@ async function testServerConnection() {
   const serverId = document.getElementById('serverId').value.trim();
   
   if (!serverUrl) {
-    showToast('Docker URL을 입력해주세요.', 'error');
+    showToast('URL을 입력해주세요.', 'error');
     return;
   }
   
@@ -1410,8 +1489,6 @@ async function testServerConnection() {
         id: serverId,
         label: '테스트',
         base_url: serverUrl,
-        type: document.getElementById('serverType').value,
-        role: document.getElementById('serverRole').value,
         tls: document.getElementById('serverTls').checked
       };
       

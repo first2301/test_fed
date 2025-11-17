@@ -8,7 +8,6 @@ let currentServers = []; // 현재 서버 목록
 function switchView(viewType) {
   const serverView = document.getElementById('serverView');
   const serverGraphView = document.getElementById('serverGraphView');
-  const statsSection = document.getElementById('statsSection');
   const toolbarSection = document.getElementById('toolbarSection');
   const serverBtn = document.getElementById('serverManagerBtn');
   const serverGraphBtn = document.getElementById('serverGraphBtn');
@@ -23,7 +22,6 @@ function switchView(viewType) {
 
   if (viewType === 'server') {
     serverView.style.display = 'block';
-    statsSection.style.display = 'none';
     toolbarSection.style.display = 'none';
     serverBtn.classList.add('active');
     
@@ -31,7 +29,6 @@ function switchView(viewType) {
     loadServerList();
   } else if (viewType === 'serverGraph') {
     serverGraphView.style.display = 'block';
-    statsSection.style.display = 'none';
     toolbarSection.style.display = 'none';
     serverGraphBtn.classList.add('active');
     
@@ -809,18 +806,6 @@ function fitServerGraph() {
   }
 }
 
-// 통계 업데이트 함수 (애니메이션 제거 - 안정성 향상)
-function updateStats(containers) {
-  const total = containers.length;
-  const running = containers.filter(c => c.status.toLowerCase() === 'running').length;
-  const stopped = Math.max(0, total - running); // 음수 방지
-
-  // 즉시 최종 값 표시 (애니메이션 없음)
-  document.getElementById('statTotal').textContent = total;
-  document.getElementById('statRunning').textContent = running;
-  document.getElementById('statStopped').textContent = stopped;
-}
-
 // 카드 렌더링 함수
 function renderContainerCards(containers, nodeId) {
   const containerGrid = document.getElementById('containerGrid');
@@ -946,9 +931,6 @@ async function reloadContainers() {
 
     // 전역 변수에 저장 (그래프에서 사용)
     currentContainers = data;
-
-    // 통계 업데이트
-    updateStats(data);
 
     // 카드 렌더링
     renderContainerCards(data, nodeId);
