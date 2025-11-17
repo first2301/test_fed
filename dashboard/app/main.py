@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 from app.config import BASE_DIR
 from app.routers import nodes, containers
 from app.services.server_service import load_servers, DOCKER_HOSTS
+from app.services.node_service import NodeService
 
 app = FastAPI(title="FL Container Dashboard")
 
@@ -22,13 +23,11 @@ DOCKER_HOSTS.update(load_servers())
 @app.get("/")
 def index(request: Request):
     """초기 페이지 렌더링"""
+    nodes = NodeService.get_all_nodes()
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
-            "nodes": [
-                {"id": node_id, "label": info["label"]}
-                for node_id, info in DOCKER_HOSTS.items()
-            ],
+            "nodes": nodes,
         },
     )
