@@ -1,0 +1,33 @@
+services:
+  # [서버 역할] Aggregator
+  fl-server:
+    build:
+      context: .
+      dockerfile: Dockerfile  # 사용자가 제공한 Dockerfile 이름
+    container_name: fl-server
+    ports:
+      # 호스트의 2222 포트를 컨테이너의 22번으로 매핑 (로컬 접속만 허용)
+      - "127.0.0.1:2222:22"
+    networks:
+      - fl-simulation
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # [클라이언트 역할] Silo
+  fl-client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fl-client
+    ports:
+      # 클라이언트도 SSH 접속 테스트를 위해 포트 매핑
+      - "127.0.0.1:2223:22"
+    networks:
+      - fl-simulation
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # 컨테이너가 계속 떠있도록 이미 Dockerfile에 설정됨
+
+networks:
+  fl-simulation:
+    driver: bridge

@@ -46,7 +46,7 @@ export async function editServer(serverId) {
     document.getElementById('serverId').value = server.id;
     document.getElementById('serverLabel').value = server.label;
     document.getElementById('serverUrl').value = server.base_url;
-    document.getElementById('serverTls').checked = server.tls || false;
+    // TLS 옵션은 현재 UI에서 숨기며, 항상 비활성(false)로 취급합니다.
     
     // 모달 열기
     const modal = document.getElementById('serverFormModal');
@@ -68,7 +68,8 @@ export async function saveServer(event, onSuccess) {
     id: document.getElementById('serverId').value.trim(),
     label: document.getElementById('serverLabel').value.trim(),
     base_url: document.getElementById('serverUrl').value.trim(),
-    tls: document.getElementById('serverTls').checked
+    // TLS 기능은 아직 미구현 상태이므로 항상 false로 전송합니다.
+    tls: false
   };
   
   if (!formData.id || !formData.label || !formData.base_url) {
@@ -132,7 +133,8 @@ export async function testServerConnection() {
         id: serverId,
         label: '테스트',
         base_url: serverUrl,
-        tls: document.getElementById('serverTls').checked
+        // TLS 기능은 아직 미구현 상태이므로 테스트 시에도 사용하지 않습니다.
+        tls: false
       };
       
       await nodesAPI.addNode(tempServer);

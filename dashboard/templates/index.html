@@ -180,12 +180,14 @@
                    placeholder="예: tcp://10.0.0.5:2376 또는 unix://var/run/docker.sock">
             <small>원격: tcp://IP:PORT, 로컬: unix://var/run/docker.sock</small>
           </div>
+          <!-- TLS 옵션은 아직 미구현 상태이므로 UI에서 숨깁니다.
           <div class="form-group">
             <label>
               <input type="checkbox" id="serverTls" name="tls">
               TLS 인증서 사용
             </label>
           </div>
+          -->
           <div class="form-actions">
             <button type="button" class="btn-modern" onclick="testServerConnection()">
               <i class="fas fa-plug"></i>
