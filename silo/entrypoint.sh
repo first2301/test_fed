@@ -23,8 +23,20 @@ if [ "$RUN_MINIO" = "true" ]; then
   MINIO_API_PORT=${MINIO_API_PORT:-9000}
   MINIO_CONSOLE_PORT=${MINIO_CONSOLE_PORT:-9001}
   
-  # MinIO 컨테이너가 이미 실행 중인지 확인
-  if ! docker ps -a | grep -q minio-server; then
+  # MinIO 데이터 디렉토리 준비 및 권한 설정
+  echo "Preparing MinIO data directory..."
+  mkdir -p /data
+  chmod 755 /data
+  
+  # MinIO 컨테이너 시작 함수
+  start_minio() {
+    # 기존 컨테이너가 있으면 제거
+    if docker ps -a | grep -q minio-server; then
+      echo "Removing existing MinIO container..."
+      docker rm -f minio-server 2>/dev/null || true
+      sleep 1
+    fi
+    
     # MinIO 이미지 pull (없는 경우)
     echo "Pulling MinIO image..."
     docker pull minio/minio:latest || echo "MinIO image pull failed or already exists"
@@ -45,16 +57,59 @@ if [ "$RUN_MINIO" = "true" ]; then
       minio/minio:latest \
       server /data --console-address ":9001"
     
-    echo "MinIO container started inside silo!"
-    echo "API: http://localhost:${MINIO_API_PORT}"
-    echo "Console: http://localhost:${MINIO_CONSOLE_PORT}"
-  elif ! docker ps | grep -q minio-server; then
-    # 컨테이너가 있지만 중지된 경우 재시작
-    echo "Restarting existing MinIO container..."
-    docker start minio-server
-    echo "MinIO container restarted!"
+    echo "MinIO container started!"
+  }
+  
+  # MinIO 컨테이너 상태 확인 및 시작
+  if ! docker ps | grep -q minio-server; then
+    if docker ps -a | grep -q minio-server; then
+      # 컨테이너가 있지만 중지된 경우 - 종료 이유 확인
+      echo "MinIO container exists but is stopped. Checking logs..."
+      docker logs --tail 50 minio-server 2>&1 || true
+      echo "Removing stopped container and recreating..."
+      docker rm -f minio-server 2>/dev/null || true
+      sleep 1
+    fi
+    start_minio
+    
+    # 컨테이너가 정상적으로 시작되었는지 확인 (최대 30초 대기)
+    echo "Waiting for MinIO to be ready..."
+    MAX_WAIT=30
+    for i in $(seq 1 $MAX_WAIT); do
+      if docker ps | grep -q minio-server; then
+        # MinIO가 응답하는지 확인 (간단한 HTTP 체크)
+        if curl -s http://localhost:9000/minio/health/live > /dev/null 2>&1; then
+          echo "MinIO is ready!"
+          break
+        fi
+        sleep 1
+      else
+        echo "MinIO container stopped unexpectedly (attempt $i/$MAX_WAIT). Attempting to restart..."
+        start_minio
+        sleep 2
+      fi
+    done
   else
     echo "MinIO container is already running"
+  fi
+  
+  # 최종 상태 확인 및 로그 출력
+  if docker ps | grep -q minio-server; then
+    echo "MinIO container status:"
+    docker ps | grep minio-server
+    echo "API: http://localhost:${MINIO_API_PORT}"
+    echo "Console: http://localhost:${MINIO_CONSOLE_PORT}"
+  else
+    echo "WARNING: MinIO container failed to start. Checking logs..."
+    docker logs --tail 100 minio-server 2>&1 || true
+    echo "Attempting final restart..."
+    start_minio
+    sleep 3
+    if docker ps | grep -q minio-server; then
+      echo "MinIO container restarted successfully!"
+    else
+      echo "ERROR: MinIO container failed to start. Please check logs manually."
+    fi
   fi
 fi
 
