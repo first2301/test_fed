@@ -20,8 +20,10 @@ services:
       - fed-net
     environment:
       - RUN_MINIO=true
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin123
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_API_PORT=9000
+      - MINIO_CONSOLE_PORT=9001
 
   # ============================================
   # Silo 2
@@ -44,8 +46,10 @@ services:
       - fed-net
     environment:
       - RUN_MINIO=true
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin123
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_API_PORT=9002
+      - MINIO_CONSOLE_PORT=9003
 
   # ============================================
   # Silo 3 ~ 6 (패턴 반복)
@@ -59,10 +63,19 @@ services:
     ports:
       - "2225:22"
       - "2373:2375"
+      - "9004:9000"   # MinIO API (S3 호환)
+      - "9005:9001"   # MinIO Console (웹 UI)
     volumes:
       - ./data/silo3:/var/lib/docker
+      - ./data/minio-silo3:/data     # MinIO 데이터 저장소
     networks:
       - fed-net
+    environment:
+      - RUN_MINIO=true
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_API_PORT=9004
+      - MINIO_CONSOLE_PORT=9005
 
   silo-4:
     build:
@@ -73,10 +86,19 @@ services:
     ports:
       - "2226:22"
       - "2374:2375"
+      - "9006:9000"   # MinIO API (S3 호환)
+      - "9007:9001"   # MinIO Console (웹 UI)
     volumes:
       - ./data/silo4:/var/lib/docker
+      - ./data/minio-silo4:/data     # MinIO 데이터 저장소
     networks:
       - fed-net
+    environment:
+      - RUN_MINIO=true
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_API_PORT=9006
+      - MINIO_CONSOLE_PORT=9007
 
   silo-5:
     build:
@@ -87,10 +109,19 @@ services:
     ports:
       - "2227:22"
       - "2375:2375"
+      - "9008:9000"   # MinIO API (S3 호환)
+      - "9009:9001"   # MinIO Console (웹 UI)
     volumes:
       - ./data/silo5:/var/lib/docker
+      - ./data/minio-silo5:/data     # MinIO 데이터 저장소
     networks:
       - fed-net
+    environment:
+      - RUN_MINIO=true
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_API_PORT=9008
+      - MINIO_CONSOLE_PORT=9009
 
   silo-6:
     build:
@@ -101,10 +132,19 @@ services:
     ports:
       - "2228:22"
       - "2376:2375"
+      - "9010:9000"   # MinIO API (S3 호환)
+      - "9011:9001"   # MinIO Console (웹 UI)
     volumes:
       - ./data/silo6:/var/lib/docker
+      - ./data/minio-silo6:/data     # MinIO 데이터 저장소
     networks:
       - fed-net
+    environment:
+      - RUN_MINIO=true
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_API_PORT=9010
+      - MINIO_CONSOLE_PORT=9011
 
   silo-7:
     build:
@@ -115,10 +155,19 @@ services:
     ports:
       - "2229:22"
       - "2377:2375"
+      - "9012:9000"   # MinIO API (S3 호환)
+      - "9013:9001"   # MinIO Console (웹 UI)
     volumes:
       - ./data/silo7:/var/lib/docker
+      - ./data/minio-silo7:/data     # MinIO 데이터 저장소
     networks:
       - fed-net
+    environment:
+      - RUN_MINIO=true
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_API_PORT=9012
+      - MINIO_CONSOLE_PORT=9013
 
   silo-8:
     build:
@@ -129,10 +178,19 @@ services:
     ports:
       - "2230:22"
       - "2378:2375"
+      - "9014:9000"   # MinIO API (S3 호환)
+      - "9015:9001"   # MinIO Console (웹 UI)
     volumes:
       - ./data/silo8:/var/lib/docker
+      - ./data/minio-silo8:/data     # MinIO 데이터 저장소
     networks:
       - fed-net
+    environment:
+      - RUN_MINIO=true
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_API_PORT=9014
+      - MINIO_CONSOLE_PORT=9015
 
   silo-9:
     build:
@@ -143,10 +201,19 @@ services:
     ports:
       - "2231:22"
       - "2379:2375"
+      - "9016:9000"   # MinIO API (S3 호환)
+      - "9017:9001"   # MinIO Console (웹 UI)
     volumes:
       - ./data/silo9:/var/lib/docker
+      - ./data/minio-silo9:/data     # MinIO 데이터 저장소
     networks:
       - fed-net
+    environment:
+      - RUN_MINIO=true
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_API_PORT=9016
+      - MINIO_CONSOLE_PORT=9017
 
   silo-10:
     build:
@@ -157,10 +224,19 @@ services:
     ports:
       - "2232:22"
       - "2380:2375"
+      - "9018:9000"   # MinIO API (S3 호환)
+      - "9019:9001"   # MinIO Console (웹 UI)
     volumes:
       - ./data/silo10:/var/lib/docker
+      - ./data/minio-silo10:/data     # MinIO 데이터 저장소
     networks:
       - fed-net
+    environment:
+      - RUN_MINIO=true
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_API_PORT=9018
+      - MINIO_CONSOLE_PORT=9019
 
   silo-11:
     build:
@@ -171,10 +247,19 @@ services:
     ports:
       - "2233:22"
       - "2381:2375"
+      - "9020:9000"   # MinIO API (S3 호환)
+      - "9021:9001"   # MinIO Console (웹 UI)
     volumes:
       - ./data/silo11:/var/lib/docker
+      - ./data/minio-silo11:/data     # MinIO 데이터 저장소
     networks:
       - fed-net
+    environment:
+      - RUN_MINIO=true
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_API_PORT=9020
+      - MINIO_CONSOLE_PORT=9021
 
   silo-12:
     build:
@@ -185,10 +270,19 @@ services:
     ports:
       - "2234:22"
       - "2382:2375"
+      - "9022:9000"   # MinIO API (S3 호환)
+      - "9023:9001"   # MinIO Console (웹 UI)
     volumes:
       - ./data/silo12:/var/lib/docker
+      - ./data/minio-silo12:/data     # MinIO 데이터 저장소
     networks:
       - fed-net
+    environment:
+      - RUN_MINIO=true
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_API_PORT=9022
+      - MINIO_CONSOLE_PORT=9023
 
 networks:
   fed-net:
