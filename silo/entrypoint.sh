@@ -33,6 +33,9 @@ if [ "$RUN_MINIO" = "true" ]; then
     # 포트 매핑: silo 컨테이너 포트 -> MinIO 컨테이너 포트
     docker run -d \
       --name minio-server \
+      --restart=unless-stopped \
+      --memory="512m" \
+      --memory-swap="512m" \
       -p ${MINIO_API_PORT}:9000 \
       -p ${MINIO_CONSOLE_PORT}:9001 \
       -e MINIO_ROOT_USER=${MINIO_ROOT_USER:-minio} \

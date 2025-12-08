@@ -24,6 +24,12 @@ services:
       - MINIO_ROOT_PASSWORD=minio
       - MINIO_API_PORT=9000
       - MINIO_CONSOLE_PORT=9001
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
   # ============================================
   # Silo 2
@@ -50,6 +56,12 @@ services:
       - MINIO_ROOT_PASSWORD=minio
       - MINIO_API_PORT=9002
       - MINIO_CONSOLE_PORT=9003
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
   # ============================================
   # Silo 3 ~ 6 (패턴 반복)
@@ -76,6 +88,12 @@ services:
       - MINIO_ROOT_PASSWORD=minio
       - MINIO_API_PORT=9004
       - MINIO_CONSOLE_PORT=9005
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
   silo-4:
     build:
@@ -99,6 +117,12 @@ services:
       - MINIO_ROOT_PASSWORD=minio
       - MINIO_API_PORT=9006
       - MINIO_CONSOLE_PORT=9007
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
   silo-5:
     build:
@@ -122,6 +146,12 @@ services:
       - MINIO_ROOT_PASSWORD=minio
       - MINIO_API_PORT=9008
       - MINIO_CONSOLE_PORT=9009
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
   silo-6:
     build:
@@ -145,6 +175,12 @@ services:
       - MINIO_ROOT_PASSWORD=minio
       - MINIO_API_PORT=9010
       - MINIO_CONSOLE_PORT=9011
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
   silo-7:
     build:
@@ -168,6 +204,12 @@ services:
       - MINIO_ROOT_PASSWORD=minio
       - MINIO_API_PORT=9012
       - MINIO_CONSOLE_PORT=9013
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
   silo-8:
     build:
@@ -191,6 +233,12 @@ services:
       - MINIO_ROOT_PASSWORD=minio
       - MINIO_API_PORT=9014
       - MINIO_CONSOLE_PORT=9015
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
   silo-9:
     build:
@@ -214,6 +262,12 @@ services:
       - MINIO_ROOT_PASSWORD=minio
       - MINIO_API_PORT=9016
       - MINIO_CONSOLE_PORT=9017
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
   silo-10:
     build:
@@ -237,6 +291,12 @@ services:
       - MINIO_ROOT_PASSWORD=minio
       - MINIO_API_PORT=9018
       - MINIO_CONSOLE_PORT=9019
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
   silo-11:
     build:
@@ -260,6 +320,12 @@ services:
       - MINIO_ROOT_PASSWORD=minio
       - MINIO_API_PORT=9020
       - MINIO_CONSOLE_PORT=9021
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
   silo-12:
     build:
@@ -283,6 +349,12 @@ services:
       - MINIO_ROOT_PASSWORD=minio
       - MINIO_API_PORT=9022
       - MINIO_CONSOLE_PORT=9023
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
 networks:
   fed-net:
