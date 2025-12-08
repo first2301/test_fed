@@ -30,14 +30,15 @@ if [ "$RUN_MINIO" = "true" ]; then
     docker pull minio/minio:latest || echo "MinIO image pull failed or already exists"
     
     # MinIO를 silo 컨테이너 내부에서 Docker 컨테이너로 실행
-    # 포트 매핑: silo 컨테이너 포트 -> MinIO 컨테이너 포트
+    # 포트 매핑: silo 컨테이너 포트(9000, 9001) -> MinIO 컨테이너 포트(9000, 9001)
+    # compose.silo.yaml에서 호스트 포트로 매핑됨
     docker run -d \
       --name minio-server \
       --restart=unless-stopped \
       --memory="512m" \
       --memory-swap="512m" \
-      -p ${MINIO_API_PORT}:9000 \
-      -p ${MINIO_CONSOLE_PORT}:9001 \
+      -p 9000:9000 \
+      -p 9001:9001 \
       -e MINIO_ROOT_USER=${MINIO_ROOT_USER:-minio} \
       -e MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minio1234} \
       -v /data:/data \
