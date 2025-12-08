@@ -21,7 +21,7 @@ services:
     environment:
       - RUN_MINIO=true
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_ROOT_PASSWORD=minio1234
       - MINIO_API_PORT=9000
       - MINIO_CONSOLE_PORT=9001
     deploy:
@@ -53,7 +53,7 @@ services:
     environment:
       - RUN_MINIO=true
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_ROOT_PASSWORD=minio1234
       - MINIO_API_PORT=9002
       - MINIO_CONSOLE_PORT=9003
     deploy:
@@ -85,7 +85,7 @@ services:
     environment:
       - RUN_MINIO=true
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_ROOT_PASSWORD=minio1234
       - MINIO_API_PORT=9004
       - MINIO_CONSOLE_PORT=9005
     deploy:
@@ -114,7 +114,7 @@ services:
     environment:
       - RUN_MINIO=true
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_ROOT_PASSWORD=minio1234
       - MINIO_API_PORT=9006
       - MINIO_CONSOLE_PORT=9007
     deploy:
@@ -143,7 +143,7 @@ services:
     environment:
       - RUN_MINIO=true
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_ROOT_PASSWORD=minio1234
       - MINIO_API_PORT=9008
       - MINIO_CONSOLE_PORT=9009
     deploy:
@@ -172,7 +172,7 @@ services:
     environment:
       - RUN_MINIO=true
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_ROOT_PASSWORD=minio1234
       - MINIO_API_PORT=9010
       - MINIO_CONSOLE_PORT=9011
     deploy:
@@ -201,7 +201,7 @@ services:
     environment:
       - RUN_MINIO=true
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_ROOT_PASSWORD=minio1234
       - MINIO_API_PORT=9012
       - MINIO_CONSOLE_PORT=9013
     deploy:
@@ -230,7 +230,7 @@ services:
     environment:
       - RUN_MINIO=true
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_ROOT_PASSWORD=minio1234
       - MINIO_API_PORT=9014
       - MINIO_CONSOLE_PORT=9015
     deploy:
@@ -259,7 +259,7 @@ services:
     environment:
       - RUN_MINIO=true
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_ROOT_PASSWORD=minio1234
       - MINIO_API_PORT=9016
       - MINIO_CONSOLE_PORT=9017
     deploy:
@@ -288,7 +288,7 @@ services:
     environment:
       - RUN_MINIO=true
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_ROOT_PASSWORD=minio1234
       - MINIO_API_PORT=9018
       - MINIO_CONSOLE_PORT=9019
     deploy:
@@ -317,7 +317,7 @@ services:
     environment:
       - RUN_MINIO=true
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_ROOT_PASSWORD=minio1234
       - MINIO_API_PORT=9020
       - MINIO_CONSOLE_PORT=9021
     deploy:
@@ -346,7 +346,7 @@ services:
     environment:
       - RUN_MINIO=true
       - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio
+      - MINIO_ROOT_PASSWORD=minio1234
       - MINIO_API_PORT=9022
       - MINIO_CONSOLE_PORT=9023
     deploy:
