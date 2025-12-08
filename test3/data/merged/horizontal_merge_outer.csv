@@ -1,0 +1,5 @@
+﻿age,cost,diagnosis,id,name
+25,,,P-001,Alice
+35,2000,B,P-003,Charlie
+30,1000,A,P-002,Bob
+,3000,C,P-004,

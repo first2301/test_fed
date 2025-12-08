@@ -1,0 +1,7 @@
+﻿a_id,a_name,b_diagnosis,b_id
+P-001,Alice,A,D-001
+P-001,Alice,B,D-002
+P-001,Alice,C,D-003
+P-002,Bob,A,D-001
+P-002,Bob,B,D-002
+P-002,Bob,C,D-003
